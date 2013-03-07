@@ -32,18 +32,6 @@ module Capistrano
       !remote_file_exists?(full_path) || remote_file_exists?(full_path) && !remote_file_content_same_as?(full_path, content)
     end
 
-    def self.hostname
-      `uname -n`.chomp.sub(/\..*/,'')
-    end
-
-    def self.username
-      `whoami`
-    end
-
-    def self.git_user
-      `git config --global user.email`
-    end
-
     def self.load_into(configuration)
       configuration.load do
         set :lockfile, "cap.lock"
@@ -59,6 +47,10 @@ module Capistrano
 
           desc "create lock"
           task :create, :roles => :app do
+            hostname = `uname -n`.chomp.sub(/\..*/,'')
+            username = `whoami`
+            git_user = `git config --global user.email`
+
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "Deploy started by #{username}@#{hostname} (#{git_user}) at #{timestamp}: in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
