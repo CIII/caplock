@@ -32,15 +32,15 @@ module Capistrano
       !remote_file_exists?(full_path) || remote_file_exists?(full_path) && !remote_file_content_same_as?(full_path, content)
     end
 
-    def hostname
+    def self.hostname
       `uname -n`.chomp.sub(/\..*/,'')
     end
 
-    def username
+    def self.username
       `whoami`
     end
 
-    def git_user
+    def self.git_user
       `git config --global user.email`
     end
 
