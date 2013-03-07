@@ -47,9 +47,9 @@ module Capistrano
 
           desc "create lock"
           task :create, :roles => :app do
-            hostname = `uname -n`.chomp.sub(/\..*/,'')
-            username = `whoami`
-            git_user = `git config --global user.email`
+            hostname = `uname -n`.chomp.sub(/\..*/,'').strip
+            username = `whoami`.strip
+            git_user = `git config --global user.email`.strip
 
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "Deploy started by #{username}@#{hostname} (#{git_user}) at #{timestamp}: in progress"
