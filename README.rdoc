@@ -2,6 +2,8 @@
 
 Adds a lock file to Capistrano deployments.
 
+Added syslog code to track past deployments.
+
 == Installation
 
    $ gem install caplock
