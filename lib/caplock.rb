@@ -1,5 +1,4 @@
 require 'capistrano'
-require 'syslog/logger'
 
 module Capistrano
   module Caplock
