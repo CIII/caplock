@@ -65,7 +65,7 @@ module Capistrano
              hostname = `uname -n`.chomp.sub(/\..*/,'').strip
              username = `whoami`.strip
 
-            if File.readlines(lockfile).grep(/#{username}/).size > 0
+            if caplock.remote_file_exists?(lockfile) && File.readlines(lockfile).grep(/#{username}/).size > 0
               logger = Syslog::Logger.new 'caplock'
               logger.info("Deploy started by #{username}@#{hostname} finished at #{timestamp}")
             end
