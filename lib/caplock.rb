@@ -1,4 +1,5 @@
 require 'capistrano'
+require 'syslog/logger'
 
 module Capistrano
   module Caplock
@@ -47,13 +48,16 @@ module Capistrano
 
           desc "create lock"
           task :create, :roles => :app do
+            
+            
             hostname = `uname -n`.chomp.sub(/\..*/,'').strip
             username = `whoami`.strip
 
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "Deploy started by #{username}@#{hostname} at #{timestamp}: in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
-            Rails.logger.info("Deploy started by #{username}@#{hostname} at #{timestamp}: in progress") 
+            logger = Syslog::Logger.new 'caplock'
+            logger.info("Deploy started by #{username}@#{hostname} at #{timestamp} in progress") 
           end
 
           desc "release lock"
@@ -61,9 +65,13 @@ module Capistrano
              hostname = `uname -n`.chomp.sub(/\..*/,'').strip
              username = `whoami`.strip
 
+            if File.readlines(lockfile).grep(/#{username}/).size > 0
+              logger = Syslog::Logger.new 'caplock'
+              logger.info("Deploy started by #{username}@#{hostname} finished at #{timestamp}")
+            end
+
              timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
              run "rm -f #{deploy_to}/#{lockfile}"
-             Rails.logger.info("Deploy started by #{username}@#{hostname} finished at #{timestamp}")
           end
         end
 
