@@ -56,8 +56,7 @@ module Capistrano
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "Deploy started by #{username}@#{hostname} at #{timestamp}: in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
-            logger = Syslog::Logger.new 'caplock'
-            logger.info("Deploy started by #{username}@#{hostname} at #{timestamp} in progress") 
+            run "echo \"Deploy started by #{username}@#{hostname} at #{timestamp} in progress\" | logger -t Capistrano" 
           end
 
           desc "release lock"
@@ -66,8 +65,7 @@ module Capistrano
              username = `whoami`.strip
 
             if caplock.remote_file_exists?(lockfile) && File.readlines(lockfile).grep(/#{username}/).size > 0
-              logger = Syslog::Logger.new 'caplock'
-              logger.info("Deploy started by #{username}@#{hostname} finished at #{timestamp}")
+              run "echo \"Deploy started by #{username}@#{hostname} finished at #{timestamp}\" | logger -t Capistrano"
             end
 
              timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
