@@ -54,11 +54,18 @@ module Capistrano
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "Deploy started by #{username}@#{hostname} (#{git_user}) at #{timestamp}: in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
+            Rails.logger.info("Deploy started by #{username}@#{hostname} (#{git_user}) at #{timestamp}: in progress") 
           end
 
           desc "release lock"
           task :release, :roles => :app do
+             hostname = `uname -n`.chomp.sub(/\..*/,'').strip
+             username = `whoami`.strip
+             git_user = `git config --global user.email`.strip
+
+             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
              run "rm -f #{deploy_to}/#{lockfile}"
+             Rails.logger.info("Deploy started by #{username}@#{hostname} (#{git_user}) finished at #{timestamp}")
           end
         end
 
