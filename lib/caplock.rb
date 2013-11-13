@@ -52,7 +52,6 @@ module Capistrano
           task :create, :roles => :app do
             hostname = run "hostname"
 
-            timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
             lock_message = "user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
             run "cat #{lockfile} | logger -t Capistrano" 
@@ -66,7 +65,6 @@ module Capistrano
               run "echo \"user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=finished\" | logger -t Capistrano"
             end
 
-             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
              run "rm -f #{deploy_to}/#{lockfile}"
           end
         end
