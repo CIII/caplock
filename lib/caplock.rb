@@ -2,6 +2,9 @@ require 'capistrano'
 
 module Capistrano
   module Caplock
+  
+    @@username = `whoami`.strip
+    @@git_hash = `git rev-parse HEAD`.strip  
 
     # Returns Boolean indicating the result of +filetest+ on +full_path+ on the server, evaluated by shell on
     # the server (usually bash or something roughly compatible).
@@ -47,24 +50,20 @@ module Capistrano
 
           desc "create lock"
           task :create, :roles => :app do
-            
-            
-            hostname = `uname -n`.chomp.sub(/\..*/,'').strip
-            username = `whoami`.strip
+            hostname = run "hostname"
 
             timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
-            lock_message = "Deploy started by #{username}@#{hostname} at #{timestamp}: in progress"
+            lock_message = "user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
             run "cat #{lockfile} | logger -t Capistrano" 
           end
 
           desc "release lock"
           task :release, :roles => :app do
-             hostname = `uname -n`.chomp.sub(/\..*/,'').strip
-             username = `whoami`.strip
+             hostname = run "hostname"
 
             if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}") && File.readlines("#{deploy_to}/#{lockfile}").grep(/#{username}/).size > 0
-              run "echo \"Deploy started by #{username}@#{hostname} finished at #{timestamp}\" | logger -t Capistrano"
+              run "echo \"user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=finished\" | logger -t Capistrano"
             end
 
              timestamp = Time.now.strftime("%m/%d/%Y %H:%M:%S %Z")
