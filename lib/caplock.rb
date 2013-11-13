@@ -67,7 +67,7 @@ module Capistrano
           end
           
           desc "add rollback syslog msg"
-          task :fail, :roles => :app do
+          task :failed, :roles => :app do
             run "echo \"user=#{@@username}:destination=#{deploy_to}:commit_hash=#{@@git_hash}:status=failed\" | logger -t Capistrano"
           end
           
@@ -82,7 +82,7 @@ module Capistrano
 
         # Rollback
         before "deploy:rollback", "lock:check"
-        after "deploy:rollback", "lock:fail"
+        after "deploy:rollback", "lock:failed"
         after "lock:fail", "lock:release"
 
       end
