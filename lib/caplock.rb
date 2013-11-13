@@ -54,7 +54,7 @@ module Capistrano
 
             lock_message = "user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
-            run "cat #{lockfile} | logger -t Capistrano" 
+            run "cat #{deploy_to}/#{lockfile} | logger -t Capistrano" 
           end
 
           desc "release lock"
