@@ -50,7 +50,7 @@ module Capistrano
 
           desc "create lock"
           task :create, :roles => :app do
-            hostname = run "hostname"
+            hostname = top.capture("hostname")
 
             lock_message = "user=#{@@username}, host=#{hostname}, destination=#{deploy_to}, commit_hash=#{@@git_hash}, status=in progress"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
@@ -59,7 +59,7 @@ module Capistrano
 
           desc "release lock"
           task :release, :roles => :app do
-             hostname = run "hostname"
+             hostname = top.capture("hostname")
 
             if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}") && top.capture("cat #{deploy_to}/#{lockfile}").scan(/#{@@username}/).size > 0
               run "echo \"user=#{@@username}, host=#{hostname}, destination=#{deploy_to}, commit_hash=#{@@git_hash}, status=finished\" | logger -t Capistrano"
