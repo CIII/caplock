@@ -61,7 +61,7 @@ module Capistrano
           task :release, :roles => :app do
              hostname = run "hostname"
 
-            if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}") && run("cat #{deploy_to}/#{lockfile}").grep(/#{username}/).size > 0
+            if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}") && run("cat #{deploy_to}/#{lockfile}").grep(/#{@@username}/).size > 0
               run "echo \"user=#{@@username}, host=#{hostname}, commit_hash=#{@@git_hash}, status=finished\" | logger -t Capistrano"
             end
 
