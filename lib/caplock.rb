@@ -45,7 +45,7 @@ module Capistrano
             if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}")
               lockmsg = capture("cat %s" % "#{deploy_to}/#{lockfile}").split(":")
               start_time = capture("stat %s | grep 'Modify: ' | cut -d' ' -f2,3,4" % "#{deploy_to}/#{lockfile}")
-              abort "\n\n\n\e[0;31m A Deployment is already in progress\n User: #{lockmsg[0]}\n Git Hash: #{lockmsg[2]}\n Start Time: #{start_time}\n\n Remove #{deploy_to}/#{lockfile} to unlock  \e[0m\n\n\n"
+              abort "\n\n\n\e[0;31m A Deployment is already in progress\n User: #{lockmsg[0]}\n Git Hash: #{lockmsg[2]}\n Start: #{start_time}\n\n Remove #{deploy_to}/#{lockfile} to unlock  \e[0m\n\n\n"
             end
           end
 
