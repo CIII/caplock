@@ -43,17 +43,18 @@ module Capistrano
           desc "check lock"
           task :check, :roles => :app do
             if caplock.remote_file_exists?("#{deploy_to}/#{lockfile}")
-              run "cat %s" % "#{deploy_to}/#{lockfile}"
-              abort "\n\n\n\e[0;31m A Deployment is already in progress\n Remove #{deploy_to}/#{lockfile} to unlock  \e[0m\n\n\n"
+              lockmsg = capture("cat %s" % "#{deploy_to}/#{lockfile}").split(":")
+              start_time = capture("stat #{lockfile} | grep 'Modify: ' | cut -d' ' -f2,3,4")
+              abort "\n\n\n\e[0;31m A Deployment is already in progress\n User:#{lockmsg[0]}, Git Hash:#{lockmsg[2]}, Start Time: #{start_time}\n Remove #{deploy_to}/#{lockfile} to unlock  \e[0m\n\n\n"
             end
           end
 
           desc "create lock"
           task :create, :roles => :app do
 
-            lock_message = "user=#{@@username}:destination=#{deploy_to}:commit_hash=#{@@git_hash}:status=started"
+            lock_message = "#{@@username}:#{deploy_to}:#{@@git_hash}:started"
             put lock_message, "#{deploy_to}/#{lockfile}", :mode => 0644
-            run "cat #{deploy_to}/#{lockfile} | logger -t Capistrano" 
+            run "echo \"user=#{@@username}:destination=#{deploy_to}:commit_hash=#{@@git_hash}:status=started\" | logger -t Capistrano" 
           end
 
           desc "release lock"
